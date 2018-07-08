@@ -1,0 +1,16 @@
+{
+  "name": "parcel-plugin-static-files-copy",
+  "version": "1.0.0",
+  "description": "ParcelJS plugin to copy static files from 'static/' dir to bundle directory.",
+  "main": "index.js",
+  "keywords": [
+    "parcel"
+  ],
+  "repository": "git@github.com:elwin013/parcel-plugin-static-files-copy.git",
+  "author": "Kamil Banach <kontakt@elwin013.com>",
+  "license": "MIT",
+  "dependencies": {
+    "file-system": "2.2.2",
+    "path": "0.12.7"
+  }
+}
