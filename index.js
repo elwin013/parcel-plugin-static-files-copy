@@ -1,8 +1,10 @@
+"use strict";
 const fs = require("file-system");
 const path = require("path");
 
 module.exports = bundler => {
     bundler.on("bundled", bundle => {
+        
         let pkgFile;
         if (
             bundler.mainAsset &&
@@ -16,7 +18,7 @@ module.exports = bundler => {
         }
 
         // Get 'staticPath' from package.json file
-        const staticDir = pkgFile["staticPath"] || "static";
+        const staticDir = pkgFile.staticPath || "static";
 
         if (fs.existsSync(staticDir)) {
             const bundleDir = path.dirname(bundle.name);
