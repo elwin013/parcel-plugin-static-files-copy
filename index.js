@@ -2,11 +2,18 @@
 const fs = require("file-system");
 const path = require("path");
 
-module.exports = bundler => {
+module.exports = async bundler => {
     bundler.on("bundled", bundle => {
         
         let pkgFile;
         if (
+            bundler.mainAsset &&
+            bundler.mainAsset.getPackage
+        ) {
+            // for parcel-bundler version@<1.9
+            pkgFile = await bundler.mainAsset.getPackage();
+        }
+        else if (
             bundler.mainAsset &&
             bundler.mainAsset.package &&
             bundler.mainAsset.package.pkgfile
