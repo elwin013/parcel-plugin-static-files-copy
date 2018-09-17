@@ -40,7 +40,7 @@ module.exports = bundler => {
             } else {
                 console.warn(`Warning: Static directory '${staticDir}' do not exist. Skipping.`);
             }
-        }
+        };
 
         // Get 'staticPath' from package.json file
         const staticDir = pkgFile.staticPath || "static";
