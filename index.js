@@ -17,27 +17,40 @@ module.exports = bundler => {
             pkgFile = bundler.mainBundle.entryAsset.package;
         }
 
+        const copyDir = (staticDir, bundleDir) => {
+            if (fs.existsSync(staticDir)) {
+                const copy = (filepath, relative, filename) => {
+                    const dest = filepath.replace(staticDir, bundleDir);
+                    if (!filename) {
+                        fs.mkdir(filepath, dest);
+                    } else {
+                        if (fs.existsSync(dest)) {
+                            const destStat = fs.statSync(dest);
+                            const srcStat = fs.statSync(filepath);
+                            if (destStat.size !== srcStat.size) { // Probably not the same, print a info about overwriting the file
+                                console.info(`Info: Static file '${filepath}' do already exist in '${bundleDir}'. Overwriting.`);
+                                fs.copyFile(filepath, dest);
+                            }
+                        } else {
+                            fs.copyFile(filepath, dest);
+                        }
+                    }
+                };
+                fs.recurseSync(staticDir, copy);
+            } else {
+                console.warn(`Warning: Static directory '${staticDir}' do not exist. Skipping.`);
+            }
+        };
+
         // Get 'staticPath' from package.json file
         const staticDir = pkgFile.staticPath || "static";
-
-        if (fs.existsSync(staticDir)) {
-            const bundleDir = path.dirname(bundle.name);
-
-            let copy = function(filepath, relative, filename) {
-                if (!filename) {
-                    fs.mkdir(filepath, filepath.replace(staticDir, bundleDir));
-                } else {
-                    fs.copyFile(
-                        filepath,
-                        filepath.replace(staticDir, bundleDir)
-                    );
-                }
-            };
-            fs.recurseSync(staticDir, copy);
+        const bundleDir = path.dirname(bundle.name);
+        if (Array.isArray(staticDir)) {
+            for(let dir of staticDir) {
+                copyDir(dir, bundleDir);
+            }
         } else {
-            console.log(
-                "Warning: Static directory do not exist. Skipping copy."
-            );
+            copyDir(staticDir, bundleDir);
         }
     });
 };

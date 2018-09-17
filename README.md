@@ -19,7 +19,7 @@ yarn add parcel-plugin-static-files-copy --dev
 
 > The plugin allows you to name the forder whose contents should be present in the build output directory.
 
-Customize the folder from where static resources need to be copied using the `staticPath` parameter in package.json file.
+Customize the folder from where static resources need to be copied using the `staticPath` parameter in package.json file. `staticPath` can both be a plain string, or an array of directories, eg. `["public", "vendor/public"]`.
 
 ```json
 // package.json
@@ -27,6 +27,15 @@ Customize the folder from where static resources need to be copied using the `st
 {
 	...
     "staticPath": "public"
+}
+```
+or
+```json
+// package.json
+
+{
+	...
+    "staticPath": ["public", "vendor/public"]
 }
 ```
 
