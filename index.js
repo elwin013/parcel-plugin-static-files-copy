@@ -4,7 +4,6 @@ const path = require("path");
 
 module.exports = bundler => {
     bundler.on("bundled", bundle => {
-        
         let pkgFile;
         if (
             bundler.mainAsset &&
@@ -14,7 +13,12 @@ module.exports = bundler => {
             // for parcel-bundler version@<1.8
             pkgFile = require(bundler.mainAsset.package.pkgfile);
         } else {
-            pkgFile = bundler.mainBundle.entryAsset.package;
+            if(bundler.mainBundle.entryAsset.hasOwnProperty("getPackage")) {
+                pkgFile = Promise.resolve(bundler.mainBundle.entryAsset.getPackage());
+            } else {
+                // for parcel bundler ~1.8.x
+                pkgFile = bundler.mainBundle.entryAsset.package;
+            }
         }
 
         const copyDir = (staticDir, bundleDir) => {
