@@ -17,6 +17,6 @@
     "path": "0.12.7"
   },
   "devDependencies": {
-    "jshint": "^2.9.6"
+    "jshint": "2.9.6"
   }
 }
