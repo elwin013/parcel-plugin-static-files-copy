@@ -5,20 +5,20 @@ const path = require("path");
 module.exports = bundler => {
     bundler.on("bundled", bundle => {
         let pkgFile;
-            if(typeof bundler.mainBundle.entryAsset.getPackage === 'function') {
-                // for parcel-bundler@>=1.9
-                pkgFile = Promise.resolve(bundler.mainBundle.entryAsset.getPackage());
-            } else {              
-                if (bundler.mainAsset &&
-                    bundler.mainAsset.package &&
-                    bundler.mainAsset.package.pkgfile) {
-                    // for parcel-bundler version@<1.8
-                    pkgFile = require(bundler.mainAsset.package.pkgfile);
-                } else {
-                    // for parcel bundler@1.8
-                    pkgFile = bundler.mainBundle.entryAsset.package;
-                }
+        if(typeof bundler.mainBundle.entryAsset.getPackage === 'function') {
+            // for parcel-bundler@>=1.9
+            pkgFile = Promise.resolve(bundler.mainBundle.entryAsset.getPackage());
+        } else {              
+            if (bundler.mainAsset &&
+                bundler.mainAsset.package &&
+                bundler.mainAsset.package.pkgfile) {
+                // for parcel-bundler version@<1.8
+                pkgFile = require(bundler.mainAsset.package.pkgfile);
+            } else {
+                // for parcel bundler@1.8
+                pkgFile = bundler.mainBundle.entryAsset.package;
             }
+        }
 
         const copyDir = (staticDir, bundleDir) => {
             if (fs.existsSync(staticDir)) {
@@ -45,15 +45,30 @@ module.exports = bundler => {
             }
         };
 
-        // Get 'staticPath' from package.json file
-        const staticDir = pkgFile.staticPath || "static";
-        const bundleDir = path.dirname(bundle.name);
-        if (Array.isArray(staticDir)) {
-            for(let dir of staticDir) {
-                copyDir(dir, bundleDir);
-            }
+        if (typeof pkgFile.then === 'function') {
+            pkgFile.then(pkg => {
+                // Get 'staticPath' from package.json file
+                const staticDir = pkg.staticPath || "static";
+                const bundleDir = path.dirname(bundle.name);
+                if (Array.isArray(staticDir)) {
+                    for(let dir of staticDir) {
+                        copyDir(dir, bundleDir);
+                    }
+                } else {
+                    copyDir(staticDir, bundleDir);
+                }
+            });
         } else {
-            copyDir(staticDir, bundleDir);
+            // Get 'staticPath' from package.json file
+            const staticDir = pkg.staticPath || "static";
+            const bundleDir = path.dirname(bundle.name);
+            if (Array.isArray(staticDir)) {
+                for(let dir of staticDir) {
+                    copyDir(dir, bundleDir);
+                }
+            } else {
+                copyDir(staticDir, bundleDir);
+            }
         }
     });
 };
