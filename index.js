@@ -60,7 +60,7 @@ module.exports = bundler => {
             });
         } else {
             // Get 'staticPath' from package.json file
-            const staticDir = pkg.staticPath || "static";
+            const staticDir = pkgFile.staticPath || "static";
             const bundleDir = path.dirname(bundle.name);
             if (Array.isArray(staticDir)) {
                 for(let dir of staticDir) {
