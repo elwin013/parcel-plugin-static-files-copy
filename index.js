@@ -30,7 +30,7 @@ module.exports = bundler => {
                         if (fs.existsSync(dest)) {
                             const destStat = fs.statSync(dest);
                             const srcStat = fs.statSync(filepath);
-                            if (destStat.size !== srcStat.size) { // Probably not the same, print a info about overwriting the file
+                            if (destStat.mtime <= srcStat.mtime) { // File was modified - let's copy it and inform about overwriting.
                                 console.info(`Info: Static file '${filepath}' do already exist in '${bundleDir}'. Overwriting.`);
                                 fs.copyFile(filepath, dest);
                             }
