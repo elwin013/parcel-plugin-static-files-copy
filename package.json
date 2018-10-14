@@ -1,7 +1,7 @@
 {
   "name": "parcel-plugin-static-files-copy",
   "version": "1.2.4",
-  "description": "ParcelJS plugin to copy static files from 'static/' dir to bundle directory.",
+  "description": "ParcelJS plugin to copy static files from static dir to bundle directory.",
   "main": "index.js",
   "scripts": {
     "test": "jshint index.js"
