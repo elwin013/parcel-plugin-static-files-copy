@@ -53,7 +53,7 @@ module.exports = bundler => {
                             const destStat = fs.statSync(dest);
                             const srcStat = fs.statSync(filepath);
                             if (destStat.mtime <= srcStat.mtime) { // File was modified - let's copy it and inform about overwriting.
-                                console.info(`Info: Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
+                                console.info(`Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
                                 fs.copyFile(filepath, dest);
                             }
                         } else {
@@ -69,7 +69,7 @@ module.exports = bundler => {
                 };
                 fs.recurseSync(staticDir, copy);
             } else {
-                console.warn(`Warning: Static directory '${staticDir}' does not exist. Skipping.`);
+                console.warn(`Static directory '${staticDir}' does not exist. Skipping.`);
             }
         };
 
@@ -78,14 +78,14 @@ module.exports = bundler => {
                 parseConfig(pkg);
                 const bundleDir = path.dirname(bundle.name);
                 for(let dir of config.staticPath) {
-                    copyDir(dir, bundleDir);
+                    copyDir(path.join(pkg.pkgdir, dir), bundleDir);
                 }
             });
         } else {
             parseConfig(pkgFile);
             const bundleDir = path.dirname(bundle.name);
             for(let dir of config.staticPath) {
-                copyDir(dir, bundleDir);
+                copyDir(path.join(pkgFile.pkgdir, dir), bundleDir);
             }
         }
     });
