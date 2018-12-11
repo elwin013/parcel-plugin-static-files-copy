@@ -23,7 +23,7 @@ module.exports = bundler => {
                 bundler.mainAsset.package &&
                 bundler.mainAsset.package.pkgfile) {
                 // for parcel-bundler version@<1.8
-                mainAsset = bundler.mainAsset
+                mainAsset = bundler.mainAsset;
                 pkgFile = require(mainAsset.package.pkgfile);
             } else {
                 // for parcel bundler@1.8
@@ -40,7 +40,7 @@ module.exports = bundler => {
             if (!Array.isArray(config.staticPath)) { // ensure array of paths
                 config.staticPath = [ config.staticPath ];
             }
-        }
+        };
 
         const copyDir = (staticDir, bundleDir) => {
             if (fs.existsSync(staticDir)) {
