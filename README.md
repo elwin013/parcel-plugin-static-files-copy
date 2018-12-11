@@ -14,27 +14,72 @@ yarn add parcel-plugin-static-files-copy --dev
 2. Fill it with your static files
 3. Run build - and that's all!
 
-### Customization options
+## Customization
 
-> The plugin allows you to name the forder whose contents should be present in the build output directory.
+Beyond the default settings, you can:
 
-Customize the folder from where static resources need to be copied using the `staticPath` parameter in package.json file. `staticPath` can both be a plain string, or an array of directories, eg. `["public", "vendor/public"]`.
+1. Name of the folder to be copied.
+1. Copy multiple folders.
+1. Watch for changes during development (rebuilding when necessary).
+
+### Example
+
+The following configures the plugin to copy all files in `public` to the build folder and watch for changes in all source files (`**` is a deep wildcard).
 
 ```json
 // package.json
-
 {
 	...
-    "staticPath": "public"
+    "staticFiles": {
+        "staticPath": "public",
+        "watcherGlob": "**",
+    }
 }
 ```
-or
+
+### Multiple Static Directories
+
+To copy more than one directory to the build folder, specify `staticPath` as an array. The following copies `public` and `vendor/public`:
+
 ```json
 // package.json
-
 {
 	...
-    "staticPath": ["public", "vendor/public"]
+    "staticFiles": {
+        "staticPath": ["public", "vendor/public"],
+    }
+}
+```
+
+### Watching for Changes
+
+Parcel can rebuild your bundle(s) whenever changes occur in the static directory. This is disabled by default, but it can be enabled by specifying a glob pattern for files that shoudl be watched.
+
+Note the relative file path is used in matching (not just the file name). To match filenames in deep directories, start with a "globstar" (double star). The plugin uses Node's built-in [Minimatch Library](https://github.com/isaacs/minimatch) for glob matching.
+
+The following watches all XML files in the static directory:
+
+```json
+// package.json
+{
+	...
+    "staticFiles": {
+        "staticPath": "public",
+        "watcherGlob": "**/*.xml",
+    }
+}
+```
+
+To disable watching, either remove the `"watcherGlob"` key (disabled is the default) or set it to false/null/undefined:
+
+```json
+// package.json
+{
+	...
+    "staticFiles": {
+        "staticPath": "public",
+        "watcherGlob": false,
+    }
 }
 ```
 
