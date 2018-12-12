@@ -2,6 +2,12 @@
 const fs = require("file-system");
 const minimatch = require("minimatch");
 const path = require("path");
+let logger;
+try { // why are there two parcel packages on npm???
+    logger = require("parcel-bundler/src/Logger")
+}catch (err) {
+    logger = require("parcel/src/Logger")
+}
 
 const DEFAULT_CONFIG = {
     "staticPath": [ "static" ],
@@ -10,38 +16,32 @@ const DEFAULT_CONFIG = {
 
 
 module.exports = bundler => {
-    bundler.on("bundled", bundle => {
-        let pkgFile;
-        let mainAsset;
-        let config;
-        if(typeof bundler.mainBundle.entryAsset.getPackage === 'function') {
-            // for parcel-bundler@>=1.9
-            mainAsset = bundler.mainBundle.entryAsset;
-            pkgFile = Promise.resolve(mainAsset.getPackage());
-        } else {
-            if (bundler.mainAsset &&
-                bundler.mainAsset.package &&
-                bundler.mainAsset.package.pkgfile) {
-                // for parcel-bundler version@<1.8
-                mainAsset = bundler.mainAsset;
-                pkgFile = require(mainAsset.package.pkgfile);
-            } else {
-                // for parcel bundler@1.8
-                mainAsset = bundler.mainBundle.entryAsset;
-                pkgFile = mainAsset.package;
-            }
+    bundler.on("bundled", async(bundle) => {
+        logger.setOptions(bundler.options);
+
+        // main asset and package dir, depending on version of parcel-bundler
+        let mainAsset =
+            bundler.mainAsset ||                                                // parcel < 1.8
+            bundler.mainBundle.entryAsset ||                                    // parcel >= 1.8 single entry point
+            bundler.mainBundle.childBundles.values().next().value.entryAsset;   // parcel >= 1.8 multiple entry points
+        let pkg;
+        if (typeof mainAsset.getPackage === 'function') {                       // parcel > 1.8
+            pkg = (await mainAsset.getPackage());
+        } else {                                   // parcel <= 1.8
+            pkg = mainAsset.package
         }
 
-        const parseConfig = (pkg) => {
-            config = Object.assign({}, DEFAULT_CONFIG, pkg.staticFiles);
-            if (pkg.staticPath) { // <1.2.5 compatability
-                config.staticPath = pkg.staticPath;
-            }
-            if (!Array.isArray(config.staticPath)) { // ensure array of paths
-                config.staticPath = [ config.staticPath ];
-            }
-        };
+        // config
+        let config = Object.assign({}, DEFAULT_CONFIG, pkg.staticFiles);
+        if (pkg.staticPath) { // parcel-plugin-static-files-copy<1.2.5
+            config.staticPath = pkg.staticPath;
+        }
+        if (!Array.isArray(config.staticPath)) { // ensure array
+            config.staticPath = [ config.staticPath ];
+        }
 
+        // recursive copy function
+        let numWatches = 0;
         const copyDir = (staticDir, bundleDir) => {
             if (fs.existsSync(staticDir)) {
                 const copy = (filepath, relative, filename) => {
@@ -53,40 +53,33 @@ module.exports = bundler => {
                             const destStat = fs.statSync(dest);
                             const srcStat = fs.statSync(filepath);
                             if (destStat.mtime <= srcStat.mtime) { // File was modified - let's copy it and inform about overwriting.
-                                console.info(`Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
+                                logger.log(`Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
                                 fs.copyFile(filepath, dest);
                             }
                         } else {
                             fs.copyFile(filepath, dest);
                         }
                         // watch for changes?
-                        if (mainAsset &&
-                            config.watcherGlob &&
-                            minimatch(filepath, config.watcherGlob)) {
+                        if (config.watcherGlob && bundler.watcher && minimatch(filepath, config.watcherGlob)) {
+                            numWatches++;
                             bundler.watch(filepath, mainAsset);
                         }
                     }
                 };
                 fs.recurseSync(staticDir, copy);
             } else {
-                console.warn(`Static directory '${staticDir}' does not exist. Skipping.`);
+                logger.warn(`Static directory '${staticDir}' does not exist. Skipping.`);
             }
         };
 
-        if (typeof pkgFile.then === 'function') {
-            pkgFile.then(pkg => {
-                parseConfig(pkg);
-                const bundleDir = path.dirname(bundle.name);
-                for(let dir of config.staticPath) {
-                    copyDir(path.join(pkg.pkgdir, dir), bundleDir);
-                }
-            });
-        } else {
-            parseConfig(pkgFile);
-            const bundleDir = path.dirname(bundle.name);
-            for(let dir of config.staticPath) {
-                copyDir(path.join(pkgFile.pkgdir, dir), bundleDir);
-            }
+        const bundleDir = path.dirname(bundle.name);
+        for (let dir of config.staticPath) {
+            copyDir(path.join(pkg.pkgdir, dir), bundleDir);
         }
+
+        if (config.watcherGlob && bundler.watcher) {
+            console.log(`Watching for changes in ${numWatches} static files.`);
+        }
+
     });
 };
