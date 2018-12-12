@@ -2,12 +2,6 @@
 const fs = require("file-system");
 const minimatch = require("minimatch");
 const path = require("path");
-let logger;
-try { // why are there two parcel packages on npm???
-    logger = require("parcel-bundler/src/Logger")
-}catch (err) {
-    logger = require("parcel/src/Logger")
-}
 
 const DEFAULT_CONFIG = {
     "staticPath": [ "static" ],
@@ -17,8 +11,6 @@ const DEFAULT_CONFIG = {
 
 module.exports = bundler => {
     bundler.on("bundled", async(bundle) => {
-        logger.setOptions(bundler.options);
-
         // main asset and package dir, depending on version of parcel-bundler
         let mainAsset =
             bundler.mainAsset ||                                                // parcel < 1.8
@@ -40,6 +32,14 @@ module.exports = bundler => {
             config.staticPath = [ config.staticPath ];
         }
 
+        // poor-man's logger
+        const logLevel = parseInt(bundler.options.logLevel);
+        const pmLog = (level, ...msgs) => {
+            if (logLevel >= level) {
+                console.log(...msgs);
+            }
+        }
+
         // recursive copy function
         let numWatches = 0;
         const copyDir = (staticDir, bundleDir) => {
@@ -53,7 +53,7 @@ module.exports = bundler => {
                             const destStat = fs.statSync(dest);
                             const srcStat = fs.statSync(filepath);
                             if (destStat.mtime <= srcStat.mtime) { // File was modified - let's copy it and inform about overwriting.
-                                logger.log(`Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
+                                pmLog(3, `Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
                                 fs.copyFile(filepath, dest);
                             }
                         } else {
@@ -68,17 +68,17 @@ module.exports = bundler => {
                 };
                 fs.recurseSync(staticDir, copy);
             } else {
-                logger.warn(`Static directory '${staticDir}' does not exist. Skipping.`);
+                pmLog(2, `Static directory '${staticDir}' does not exist. Skipping.`);
             }
         };
 
-        const bundleDir = path.dirname(bundle.name);
+        const bundleDir = path.dirname(bundle.name || bundler.mainBundle.childBundles.values().next().value.name);
         for (let dir of config.staticPath) {
             copyDir(path.join(pkg.pkgdir, dir), bundleDir);
         }
 
         if (config.watcherGlob && bundler.watcher) {
-            console.log(`Watching for changes in ${numWatches} static files.`);
+            pmLog(3, `Watching for changes in ${numWatches} static files.`);
         }
 
     });
