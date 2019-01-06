@@ -1,25 +1,47 @@
-"use strict";
-const fs = require("file-system");
-const path = require("path");
+'use strict';
+const fs = require('file-system');
+const minimatch = require('minimatch');
+const path = require('path');
+
+const DEFAULT_CONFIG = {
+    'staticPath': [ 'static' ],
+    'watcherGlob': null
+};
+
 
 module.exports = bundler => {
-    bundler.on("bundled", bundle => {
-        let pkgFile;
-        if(typeof bundler.mainBundle.entryAsset.getPackage === 'function') {
-            // for parcel-bundler@>=1.9
-            pkgFile = Promise.resolve(bundler.mainBundle.entryAsset.getPackage());
-        } else {              
-            if (bundler.mainAsset &&
-                bundler.mainAsset.package &&
-                bundler.mainAsset.package.pkgfile) {
-                // for parcel-bundler version@<1.8
-                pkgFile = require(bundler.mainAsset.package.pkgfile);
-            } else {
-                // for parcel bundler@1.8
-                pkgFile = bundler.mainBundle.entryAsset.package;
-            }
+    bundler.on('bundled', async(bundle) => {
+        // main asset and package dir, depending on version of parcel-bundler
+        let mainAsset =
+            bundler.mainAsset ||                                                // parcel < 1.8
+            bundler.mainBundle.entryAsset ||                                    // parcel >= 1.8 single entry point
+            bundler.mainBundle.childBundles.values().next().value.entryAsset;   // parcel >= 1.8 multiple entry points
+        let pkg;
+        if (typeof mainAsset.getPackage === 'function') {                       // parcel > 1.8
+            pkg = (await mainAsset.getPackage());
+        } else {                                   // parcel <= 1.8
+            pkg = mainAsset.package;
         }
 
+        // config
+        let config = Object.assign({}, DEFAULT_CONFIG, pkg.staticFiles);
+        if (pkg.staticPath) { // parcel-plugin-static-files-copy<1.2.5
+            config.staticPath = pkg.staticPath;
+        }
+        if (!Array.isArray(config.staticPath)) { // ensure array
+            config.staticPath = [ config.staticPath ];
+        }
+
+        // poor-man's logger
+        const logLevel = parseInt(bundler.options.logLevel);
+        const pmLog = (level, ...msgs) => {
+            if (logLevel >= level) {
+                console.log(...msgs);
+            }
+        };
+
+        // recursive copy function
+        let numWatches = 0;
         const copyDir = (staticDir, bundleDir) => {
             if (fs.existsSync(staticDir)) {
                 const copy = (filepath, relative, filename) => {
@@ -31,44 +53,33 @@ module.exports = bundler => {
                             const destStat = fs.statSync(dest);
                             const srcStat = fs.statSync(filepath);
                             if (destStat.mtime <= srcStat.mtime) { // File was modified - let's copy it and inform about overwriting.
-                                console.info(`Info: Static file '${filepath}' do already exist in '${bundleDir}'. Overwriting.`);
+                                pmLog(3, `Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
                                 fs.copyFile(filepath, dest);
                             }
                         } else {
                             fs.copyFile(filepath, dest);
                         }
+                        // watch for changes?
+                        if (config.watcherGlob && bundler.watcher && minimatch(filepath, config.watcherGlob)) {
+                            numWatches++;
+                            bundler.watch(filepath, mainAsset);
+                        }
                     }
                 };
                 fs.recurseSync(staticDir, copy);
             } else {
-                console.warn(`Warning: Static directory '${staticDir}' do not exist. Skipping.`);
+                pmLog(2, `Static directory '${staticDir}' does not exist. Skipping.`);
             }
         };
 
-        if (typeof pkgFile.then === 'function') {
-            pkgFile.then(pkg => {
-                // Get 'staticPath' from package.json file
-                const staticDir = pkg.staticPath || "static";
-                const bundleDir = path.dirname(bundle.name);
-                if (Array.isArray(staticDir)) {
-                    for(let dir of staticDir) {
-                        copyDir(dir, bundleDir);
-                    }
-                } else {
-                    copyDir(staticDir, bundleDir);
-                }
-            });
-        } else {
-            // Get 'staticPath' from package.json file
-            const staticDir = pkgFile.staticPath || "static";
-            const bundleDir = path.dirname(bundle.name);
-            if (Array.isArray(staticDir)) {
-                for(let dir of staticDir) {
-                    copyDir(dir, bundleDir);
-                }
-            } else {
-                copyDir(staticDir, bundleDir);
-            }
+        const bundleDir = path.dirname(bundle.name || bundler.mainBundle.childBundles.values().next().value.name);
+        for (let dir of config.staticPath) {
+            copyDir(path.join(pkg.pkgdir, dir), bundleDir);
         }
+
+        if (config.watcherGlob && bundler.watcher) {
+            pmLog(3, `Watching for changes in ${numWatches} static files.`);
+        }
+
     });
 };
