@@ -1,16 +1,16 @@
-"use strict";
-const fs = require("file-system");
-const minimatch = require("minimatch");
-const path = require("path");
+'use strict';
+const fs = require('file-system');
+const minimatch = require('minimatch');
+const path = require('path');
 
 const DEFAULT_CONFIG = {
-    "staticPath": [ "static" ],
-    "watcherGlob": null
+    'staticPath': [ 'static' ],
+    'watcherGlob': null
 };
 
 
 module.exports = bundler => {
-    bundler.on("bundled", async(bundle) => {
+    bundler.on('bundled', async(bundle) => {
         // main asset and package dir, depending on version of parcel-bundler
         let mainAsset =
             bundler.mainAsset ||                                                // parcel < 1.8
@@ -20,7 +20,7 @@ module.exports = bundler => {
         if (typeof mainAsset.getPackage === 'function') {                       // parcel > 1.8
             pkg = (await mainAsset.getPackage());
         } else {                                   // parcel <= 1.8
-            pkg = mainAsset.package
+            pkg = mainAsset.package;
         }
 
         // config
@@ -38,7 +38,7 @@ module.exports = bundler => {
             if (logLevel >= level) {
                 console.log(...msgs);
             }
-        }
+        };
 
         // recursive copy function
         let numWatches = 0;

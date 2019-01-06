@@ -1,25 +1,4 @@
 {
-  "_from": "git+https://github.com/doconix/parcel-plugin-static-files-copy.git",
-  "_id": "parcel-plugin-static-files-copy@1.2.6",
-  "_inBundle": false,
-  "_integrity": "",
-  "_location": "/parcel-plugin-static-files-copy",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "git",
-    "raw": "https://github.com/doconix/parcel-plugin-static-files-copy",
-    "rawSpec": "https://github.com/doconix/parcel-plugin-static-files-copy",
-    "saveSpec": "git+https://github.com/doconix/parcel-plugin-static-files-copy.git",
-    "fetchSpec": "https://github.com/doconix/parcel-plugin-static-files-copy.git",
-    "gitCommittish": null
-  },
-  "_requiredBy": [
-    "#DEV:/",
-    "#USER"
-  ],
-  "_resolved": "git+https://github.com/doconix/parcel-plugin-static-files-copy.git#40e87b53f2e7d490e40cea21734f4a8331bd92f0",
-  "_spec": "https://github.com/doconix/parcel-plugin-static-files-copy",
-  "_where": "/Users/conan/Documents/data/programming/ee-atlas",
   "author": {
     "name": "Kamil Banach",
     "email": "kontakt@elwin013.com"
@@ -30,13 +9,13 @@
   "bundleDependencies": false,
   "dependencies": {
     "file-system": "2.2.2",
-    "path": "0.12.7",
-    "minimatch": "^3.0.4"
+    "minimatch": "3.0.4",
+    "path": "0.12.7"
   },
   "deprecated": false,
   "description": "ParcelJS plugin to copy static files from static dir to bundle directory.",
   "devDependencies": {
-    "jshint": "2.9.6"
+    "eslint": "5.12.0"
   },
   "homepage": "https://github.com/elwin013/parcel-plugin-static-files-copy#readme",
   "keywords": [
@@ -50,7 +29,7 @@
     "url": "git+ssh://git@github.com/elwin013/parcel-plugin-static-files-copy.git"
   },
   "scripts": {
-    "test": "jshint index.js"
+    "test": "eslint index.js"
   },
   "version": "1.3.0"
 }
