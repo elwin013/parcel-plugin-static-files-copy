@@ -6,7 +6,6 @@
   "bugs": {
     "url": "https://github.com/elwin013/parcel-plugin-static-files-copy/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "file-system": "2.2.2",
     "minimatch": "3.0.4",
@@ -31,5 +30,5 @@
   "scripts": {
     "test": "eslint index.js"
   },
-  "version": "1.3.0"
+  "version": "2.0.0"
 }
