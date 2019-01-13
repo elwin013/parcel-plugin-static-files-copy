@@ -32,7 +32,7 @@ The following configures the plugin to copy all files in `public` to the build f
 	...
     "staticFiles": {
         "staticPath": "public",
-        "watcherGlob": "**",
+        "watcherGlob": "**"
     }
 }
 ```
@@ -46,7 +46,7 @@ To copy more than one directory to the build folder, specify `staticPath` as an 
 {
 	...
     "staticFiles": {
-        "staticPath": ["public", "vendor/public"],
+        "staticPath": ["public", "vendor/public"]
     }
 }
 ```
@@ -65,7 +65,7 @@ The following watches all XML files in the static directory:
 	...
     "staticFiles": {
         "staticPath": "public",
-        "watcherGlob": "**/*.xml",
+        "watcherGlob": "**/*.xml"
     }
 }
 ```
@@ -78,7 +78,7 @@ To disable watching, either remove the `"watcherGlob"` key (disabled is the defa
 	...
     "staticFiles": {
         "staticPath": "public",
-        "watcherGlob": false,
+        "watcherGlob": false
     }
 }
 ```
