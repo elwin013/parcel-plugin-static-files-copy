@@ -11,8 +11,6 @@ const DEFAULT_CONFIG = {
 module.exports = bundler => {
     bundler.on('bundled', async(bundle) => {
 
-        console.log("outDir", bundler.options.outDir)
-
         // main asset and package dir, depending on version of parcel-bundler
         let mainAsset =
             bundler.mainAsset ||                                                // parcel < 1.8
@@ -50,7 +48,7 @@ module.exports = bundler => {
         config.staticPath = config.staticPath.map( path => {
             if ( typeof path === 'object' ) {
                 if ( !path.staticPath || !path.outDirPattern ) {
-                    console.error("When staticPath is an object, expecting it to have the keys 'staticPath' and 'outDirPattern', but found: ", path)
+                    console.error("Error: parcel-plugin-static-files-copy: When staticPath is an object, expecting it to have the keys 'staticPath' and 'outDirPattern', but found: ", path)
                     return null;
                 }
 
