@@ -45,24 +45,24 @@ module.exports = bundler => {
         // by specifying them in the form 
         // {"outDirPattern":"dist1", "staticPath":"static1"},
         // {"outDirPattern":"dist2", "staticPath":"static2"}
-        config.staticPath = config.staticPath.map( path => {
-            if ( typeof path === 'object' ) {
-                if ( !path.staticPath || !path.outDirPattern ) {
+        config.staticPath = config.staticPath.map(path => {
+            if (typeof path === 'object') {
+                if (!path.staticPath || !path.outDirPattern) {
                     console.error(`Error: parcel-plugin-static-files-copy: When staticPath is an object, expecting it to have the keys 'staticPath' and 'outDirPattern', but found: ${path}`);
                     return null;
                 }
 
-                if ( minimatch(bundler.options.outDir, path.outDirPattern) ) {
-                    pmLog( 3, `outDir matches '${path.outDirPattern}' so copying static files from '${path.staticPath}'`);
+                if (minimatch(bundler.options.outDir, path.outDirPattern)) {
+                    pmLog(3, `outDir matches '${path.outDirPattern}' so copying static files from '${path.staticPath}'`);
                     return path.staticPath;
                 } else {
-                    pmLog( 3, `outDir does not match '${path.outDirPattern} so not copying static files from '${path.staticPath}'`);
+                    pmLog(3, `outDir does not match '${path.outDirPattern} so not copying static files from '${path.staticPath}'`);
                     return null;
                 }
             } else {
                 return path;
             }
-        } ).filter(path=>path!=null);
+        }).filter(path => path != null);
 
         console.log(`config.staticPath after handling conditionals: ${config.staticPath}`);
 
