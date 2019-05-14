@@ -1,6 +1,6 @@
 # parcel-plugin-static-files-copy [![Build Status](https://travis-ci.org/elwin013/parcel-plugin-static-files-copy.svg?branch=master)](https://travis-ci.org/elwin013/parcel-plugin-static-files-copy)
 
-ParcelJS plugin to copy static files from some dir to directory with bundle.
+ParcelJS plugin to copy static files from some directory to directory with bundle.
 
 ## Install
 
@@ -10,7 +10,7 @@ yarn add parcel-plugin-static-files-copy --dev
 
 ## Usage
 
-1. Create `static` dir in you project root.
+1. Create `static` directory in you project root.
 2. Fill it with your static files
 3. Run build - and that's all!
 
@@ -18,13 +18,14 @@ yarn add parcel-plugin-static-files-copy --dev
 
 Beyond the default settings, you can:
 
-1. Name of the folder to be copied.
-1. Copy multiple folders.
-1. Watch for changes during development (rebuilding when necessary).
+1. Name of the directory to be copied.
+2. Copy multiple directory.
+3. Copy different directory based on different output directory.
+3. Watch for changes during development (rebuilding when necessary).
 
 ### Example
 
-The following configures the plugin to copy all files in `public` to the build folder and watch for changes in all source files (`**` is a deep wildcard).
+The following configures the plugin to copy all files in `public` to the build directory and watch for changes in all source files (`**` is a deep wildcard).
 
 ```json
 // package.json
@@ -39,7 +40,7 @@ The following configures the plugin to copy all files in `public` to the build f
 
 ### Multiple Static Directories
 
-To copy more than one directory to the build folder, specify `staticPath` as an array. The following copies `public` and `vendor/public`:
+To copy more than one directory to the build directory, specify `staticPath` as an array. The following copies `public` and `vendor/public`:
 
 ```json
 // package.json
@@ -48,6 +49,29 @@ To copy more than one directory to the build folder, specify `staticPath` as an 
     "staticFiles": {
         "staticPath": ["public", "vendor/public"]
     }
+}
+```
+
+### Different source of static files based on output directory
+
+To copy different files (from different directories) based on output directory (e.g. `--out-dir dist1` and `--out-dir dist2`) make `staticPath` a object:
+
+```json
+// package.json
+{
+    ...
+    "staticFiles": {
+        "staticPath": [
+            {
+                "outDirPattern": "**/dist1",
+                "staticPath": "static1"
+            },
+            {
+                "outDirPattern": "**/dist2",
+                "staticPath": "static2"
+            }
+        ]
+  },
 }
 ```
 
