@@ -56,7 +56,7 @@ module.exports = bundler => {
                     pmLog(3, `outDir matches '${path.outDirPattern}' so copying static files from '${path.staticPath}'`);
                     return path.staticPath;
                 } else {
-                    pmLog(3, `outDir does not match '${path.outDirPattern} so not copying static files from '${path.staticPath}'`);
+                    pmLog(3, `outDir does not match '${path.outDirPattern}' so not copying static files from '${path.staticPath}'`);
                     return null;
                 }
             } else {
