@@ -8,9 +8,9 @@ const DEFAULT_CONFIG = {
     'watcherGlob': null
 };
 
-
 module.exports = bundler => {
     bundler.on('bundled', async(bundle) => {
+
         // main asset and package dir, depending on version of parcel-bundler
         let mainAsset =
             bundler.mainAsset ||                                                // parcel < 1.8
@@ -39,6 +39,32 @@ module.exports = bundler => {
                 console.log(...msgs);
             }
         };
+
+        // static paths are usually just a string can be specified as 
+        // an object to make them conditional on the output directory
+        // by specifying them in the form 
+        // {"outDirPattern":"dist1", "staticPath":"static1"},
+        // {"outDirPattern":"dist2", "staticPath":"static2"}
+        config.staticPath = config.staticPath.map(path => {
+            if (typeof path === 'object') {
+                if (!path.staticPath || !path.outDirPattern) {
+                    console.error(`Error: parcel-plugin-static-files-copy: When staticPath is an object, expecting it to have the keys 'staticPath' and 'outDirPattern', but found: ${path}`);
+                    return null;
+                }
+
+                if (minimatch(bundler.options.outDir, path.outDirPattern)) {
+                    pmLog(3, `outDir matches '${path.outDirPattern}' so copying static files from '${path.staticPath}'`);
+                    return path.staticPath;
+                } else {
+                    pmLog(3, `outDir does not match '${path.outDirPattern}' so not copying static files from '${path.staticPath}'`);
+                    return null;
+                }
+            } else {
+                return path;
+            }
+        }).filter(path => path != null);
+
+        console.log(`config.staticPath after handling conditionals: ${config.staticPath}`);
 
         // recursive copy function
         let numWatches = 0;
