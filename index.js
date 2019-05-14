@@ -48,15 +48,15 @@ module.exports = bundler => {
         config.staticPath = config.staticPath.map( path => {
             if ( typeof path === 'object' ) {
                 if ( !path.staticPath || !path.outDirPattern ) {
-                    console.error("Error: parcel-plugin-static-files-copy: When staticPath is an object, expecting it to have the keys 'staticPath' and 'outDirPattern', but found: ", path)
+                    console.error(`Error: parcel-plugin-static-files-copy: When staticPath is an object, expecting it to have the keys 'staticPath' and 'outDirPattern', but found: ${path}`);
                     return null;
                 }
 
                 if ( minimatch(bundler.options.outDir, path.outDirPattern) ) {
-                    pmLog( 3, "outDir matches '" + path.outDirPattern + "'' so copying static files from '" + path.staticPath + "'");
-                    return path.staticPath
+                    pmLog( 3, `outDir matches '${path.outDirPattern}' so copying static files from '${path.staticPath}'`);
+                    return path.staticPath;
                 } else {
-                    pmLog( 3, "outDir does not match '" + path.outDirPattern + "'' so not copying static files from '" + path.staticPath + "'");
+                    pmLog( 3, `outDir does not match '${path.outDirPattern} so not copying static files from '${path.staticPath}'`);
                     return null;
                 }
             } else {
@@ -64,7 +64,7 @@ module.exports = bundler => {
             }
         } ).filter(path=>path!=null);
 
-        console.log( "config.staticPath after handling conditionals: ", config.staticPath );
+        console.log(`config.staticPath after handling conditionals: ${config.staticPath}`);
 
         // recursive copy function
         let numWatches = 0;
