@@ -64,8 +64,6 @@ module.exports = bundler => {
             }
         }).filter(path => path != null);
 
-        console.log(`config.staticPath after handling conditionals: ${config.staticPath}`);
-
         // recursive copy function
         let numWatches = 0;
         const copyDir = (staticDir, bundleDir) => {
