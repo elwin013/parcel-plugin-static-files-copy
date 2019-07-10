@@ -70,6 +70,10 @@ module.exports = bundler => {
             if (fs.existsSync(staticDir)) {
                 const copy = (filepath, relative, filename) => {
                     const dest = filepath.replace(staticDir, bundleDir);
+                    if (config.matchGlob && !minimatch(dest, config.watcherGlob || '**')) {
+                        return;
+                    }
+
                     if (!filename) {
                         fs.mkdir(filepath, dest);
                     } else {
