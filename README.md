@@ -38,6 +38,23 @@ The following configures the plugin to copy all files in `public` to the build d
 }
 ```
 
+### Copying only specific files
+Setting the`matchGlob` property to `true`, will cause only desired files to be copied, helps when you need to deep-copy contents from directory, exampel:
+
+```json
+// package.json
+{
+	...
+    "staticFiles": {
+        "staticPath": "src",
+        "watcherGlob": "**/locales/*.+(txt|json)",
+        "matchGlob": true
+    }
+}
+```
+
+This above copy (and watch for changes) all files from `src/example/locales/`, that have the `json` or `txt` extension, into `dist/example/locales/`.
+
 ### Multiple Static Directories
 
 To copy more than one directory to the build directory, specify `staticPath` as an array. The following copies `public` and `vendor/public`:
