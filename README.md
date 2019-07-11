@@ -76,6 +76,27 @@ To copy different files (from different directories) based on output directory (
 }
 ```
 
+### Specify directory to copy static files into
+
+If you want your files from `staticPath` to get copied into a subdirectory inside the parcel `--out-dir`, make `staticPath` an object with `staticOutDir` key:
+
+```json
+// package.json
+{
+    ...
+    "staticFiles": {
+        "staticPath": [
+            {
+                "staticPath": "static1",
+                "staticOutDir": "vendor"
+            }
+        ]
+  },
+}
+```
+
+Copies files from `static1` into the `vendor` directory inside the `--out-dir`.
+
 ### Watching for Changes
 
 Parcel can rebuild your bundle(s) whenever changes occur in the static directory. This is disabled by default, but it can be enabled by specifying a glob pattern for files that shoudl be watched.
