@@ -22,6 +22,7 @@ Beyond the default settings, you can:
 2. Copy multiple directory.
 3. Copy different directory based on different output directory.
 3. Watch for changes during development (rebuilding when necessary).
+4. Exclude paths from copying
 
 ### Example
 
@@ -106,6 +107,61 @@ To disable watching, either remove the `"watcherGlob"` key (disabled is the defa
     }
 }
 ```
+
+### Excluding paths
+
+You can exclude files and directories in your `staticPath` from getting copied to the `outDir` by specifying `excludeGlob`:
+
+```json
+// package.json
+{
+	...
+    "staticFiles": {
+        "staticPath": "public",
+        "excludeGlob": "**/*.md"
+    }
+}
+```
+
+Excludes all `.md` files in the `public` path from getting copied.
+
+
+Multiple `excludeGlob`s are possible by specifying it as array:
+
+```json
+// package.json
+{
+	...
+    "staticFiles": {
+        "staticPath": "public",
+        "excludeGlob": ["docs", "docs/**"]
+    }
+}
+```
+
+Excludes the `docs` directory and all files inside the `docs` directory from getting copied.
+
+
+### Minimatch glob options
+
+Passing [options into minimatch](https://github.com/isaacs/minimatch#options) to change `watcherGlob` and `excludeGlob` behavior is possible by specifying a `globOptions` object:
+
+```json
+// package.json
+{
+	...
+    "staticFiles": {
+        "staticPath": "public",
+        "excludeGlob": ["test", "test/**"],
+        "globOptions": {
+            "dot": true
+        }
+    }
+}
+```
+
+Excludes the `test` directory and all files inside the `test` directory, including files starting with a dot, from getting copied.
+
 
 ## Contribute
 

@@ -5,7 +5,9 @@ const path = require('path');
 
 const DEFAULT_CONFIG = {
     'staticPath': [ 'static' ],
-    'watcherGlob': null
+    'watcherGlob': null,
+    'excludeGlob': null,
+    'globOptions': {}
 };
 
 module.exports = bundler => {
@@ -31,6 +33,9 @@ module.exports = bundler => {
         if (!Array.isArray(config.staticPath)) { // ensure array
             config.staticPath = [ config.staticPath ];
         }
+        if (config.excludeGlob && !Array.isArray(config.excludeGlob)) {
+            config.excludeGlob = [ config.excludeGlob ];
+        }
 
         // poor-man's logger
         const logLevel = parseInt(bundler.options.logLevel);
@@ -40,9 +45,9 @@ module.exports = bundler => {
             }
         };
 
-        // static paths are usually just a string can be specified as 
+        // static paths are usually just a string can be specified as
         // an object to make them conditional on the output directory
-        // by specifying them in the form 
+        // by specifying them in the form
         // {"outDirPattern":"dist1", "staticPath":"static1"},
         // {"outDirPattern":"dist2", "staticPath":"static2"}
         config.staticPath = config.staticPath.map(path => {
@@ -52,7 +57,7 @@ module.exports = bundler => {
                     return null;
                 }
 
-                if (minimatch(bundler.options.outDir, path.outDirPattern)) {
+                if (minimatch(bundler.options.outDir, path.outDirPattern, config.globOptions)) {
                     pmLog(3, `outDir matches '${path.outDirPattern}' so copying static files from '${path.staticPath}'`);
                     return path.staticPath;
                 } else {
@@ -69,6 +74,12 @@ module.exports = bundler => {
         const copyDir = (staticDir, bundleDir) => {
             if (fs.existsSync(staticDir)) {
                 const copy = (filepath, relative, filename) => {
+                    if (config.excludeGlob && config.excludeGlob.find(excludeGlob =>
+                        minimatch(filepath, path.join(staticDir, excludeGlob), config.globOptions)
+                    )) {
+                        return;
+                    }
+
                     const dest = filepath.replace(staticDir, bundleDir);
                     if (!filename) {
                         fs.mkdir(filepath, dest);
@@ -84,7 +95,7 @@ module.exports = bundler => {
                             fs.copyFile(filepath, dest);
                         }
                         // watch for changes?
-                        if (config.watcherGlob && bundler.watcher && minimatch(filepath, config.watcherGlob)) {
+                        if (config.watcherGlob && bundler.watcher && minimatch(filepath, config.watcherGlob, config.globOptions)) {
                             numWatches++;
                             bundler.watch(filepath, mainAsset);
                         }
