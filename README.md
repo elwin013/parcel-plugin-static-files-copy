@@ -142,6 +142,25 @@ Multiple `excludeGlob`s are possible by specifying it as array:
 Excludes the `docs` directory and all files inside the `docs` directory from getting copied.
 
 
+### Including paths
+
+You can use the `excludeGlob` and negate it to achieve including behavior:
+
+
+```json
+// package.json
+{
+	...
+    "staticFiles": {
+        "staticPath": "src",
+        "excludeGlob": "**/!(locales)/*.+(!(txt)|!(json))"
+    }
+}
+```
+
+Includes only files from `locales` directory with `.txt` or `.json` extension.
+
+
 ### Minimatch glob options
 
 Passing [options into minimatch](https://github.com/isaacs/minimatch#options) to change `watcherGlob` and `excludeGlob` behavior is possible by specifying a `globOptions` object:
