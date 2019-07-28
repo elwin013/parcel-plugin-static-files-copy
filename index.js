@@ -52,20 +52,23 @@ module.exports = bundler => {
         // {"outDirPattern":"dist2", "staticPath":"static2"}
         config.staticPath = config.staticPath.map(path => {
             if (typeof path === 'object') {
-                if (!path.staticPath || !path.outDirPattern) {
-                    console.error(`Error: parcel-plugin-static-files-copy: When staticPath is an object, expecting it to have the keys 'staticPath' and 'outDirPattern', but found: ${path}`);
+                if (!path.staticPath) {
+                    console.error(`Error: parcel-plugin-static-files-copy: When staticPath is an object, expecting it to have at least the 'staticPath' key, but found: ${path}`);
                     return null;
                 }
 
-                if (minimatch(bundler.options.outDir, path.outDirPattern, config.globOptions)) {
-                    pmLog(3, `outDir matches '${path.outDirPattern}' so copying static files from '${path.staticPath}'`);
-                    return path.staticPath;
-                } else {
-                    pmLog(3, `outDir does not match '${path.outDirPattern}' so not copying static files from '${path.staticPath}'`);
-                    return null;
+                if (path.outDirPattern) {
+                    if (minimatch(bundler.options.outDir, path.outDirPattern, config.globOptions)) {
+                        pmLog(3, `outDir matches '${path.outDirPattern}' so copying static files from '${path.staticPath}'`);
+                    } else {
+                        pmLog(3, `outDir does not match '${path.outDirPattern}' so not copying static files from '${path.staticPath}'`);
+                        return null;
+                    }
                 }
-            } else {
+
                 return path;
+            } else {
+                return {staticPath: path};
             }
         }).filter(path => path != null);
 
@@ -107,9 +110,13 @@ module.exports = bundler => {
             }
         };
 
-        const bundleDir = path.dirname(bundle.name || bundler.mainBundle.childBundles.values().next().value.name);
+        let bundleDir = path.dirname(bundle.name || bundler.mainBundle.childBundles.values().next().value.name);
         for (let dir of config.staticPath) {
-            copyDir(path.join(pkg.pkgdir, dir), bundleDir);
+            if (dir.staticOutDir) {
+                bundleDir = path.join(bundleDir, dir.staticOutDir);
+            }
+
+            copyDir(path.join(pkg.pkgdir, dir.staticPath), bundleDir);
         }
 
         if (config.watcherGlob && bundler.watcher) {
