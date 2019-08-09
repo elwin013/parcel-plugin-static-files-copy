@@ -110,13 +110,13 @@ module.exports = bundler => {
             }
         };
 
-        let bundleDir = path.dirname(bundle.name || bundler.mainBundle.childBundles.values().next().value.name);
+        const bundleDir = path.dirname(bundle.name || bundler.mainBundle.childBundles.values().next().value.name);
         for (let dir of config.staticPath) {
-            if (dir.staticOutDir) {
-                bundleDir = path.join(bundleDir, dir.staticOutDir);
-            }
+            const copyTo = dir.staticOutDir
+                ? path.join(bundleDir, dir.staticOutDir)
+                : bundleDir;
 
-            copyDir(path.join(pkg.pkgdir, dir.staticPath), bundleDir);
+            copyDir(path.join(pkg.pkgdir, dir.staticPath), copyTo);
         }
 
         if (config.watcherGlob && bundler.watcher) {
