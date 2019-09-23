@@ -74,10 +74,10 @@ module.exports = bundler => {
 
         // recursive copy function
         let numWatches = 0;
-        const copyDir = (staticDir, bundleDir) => {
+        const copyDir = (staticDir, bundleDir, excludeGlob) => {
             if (fs.existsSync(staticDir)) {
                 const copy = (filepath, relative, filename) => {
-                    if (config.excludeGlob && config.excludeGlob.find(excludeGlob =>
+                    if (excludeGlob.find(excludeGlob =>
                         minimatch(filepath, path.join(staticDir, excludeGlob), config.globOptions)
                     )) {
                         return;
@@ -115,8 +115,9 @@ module.exports = bundler => {
             const copyTo = dir.staticOutDir
                 ? path.join(bundleDir, dir.staticOutDir)
                 : bundleDir;
-
-            copyDir(path.join(pkg.pkgdir, dir.staticPath), copyTo);
+            // merge global exclude glob with static path exclude glob
+            const excludeGlob = (config.excludeGlob || []).concat((dir.excludeGlob || [])); 
+            copyDir(path.join(pkg.pkgdir, dir.staticPath), copyTo, excludeGlob);
         }
 
         if (config.watcherGlob && bundler.watcher) {
