@@ -85,17 +85,17 @@ module.exports = bundler => {
 
                     const dest = filepath.replace(staticDir, bundleDir);
                     if (!filename) {
-                        fs.mkdir(filepath, dest);
+                        fs.mkdirSync(filepath, dest);
                     } else {
                         if (fs.existsSync(dest)) {
                             const destStat = fs.statSync(dest);
                             const srcStat = fs.statSync(filepath);
                             if (destStat.mtime <= srcStat.mtime) { // File was modified - let's copy it and inform about overwriting.
                                 pmLog(3, `Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
-                                fs.copyFile(filepath, dest);
+                                fs.copyFileSync(filepath, dest);
                             }
                         } else {
-                            fs.copyFile(filepath, dest);
+                            fs.copyFileSync(filepath, dest);
                         }
                         // watch for changes?
                         if (config.watcherGlob && bundler.watcher && minimatch(filepath, config.watcherGlob, config.globOptions)) {
