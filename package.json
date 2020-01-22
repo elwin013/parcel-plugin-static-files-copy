@@ -30,5 +30,5 @@
   "scripts": {
     "test": "eslint index.js"
   },
-  "version": "2.2.2"
+  "version": "2.3.1"
 }
