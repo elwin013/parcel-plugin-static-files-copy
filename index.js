@@ -1,17 +1,17 @@
 'use strict';
-const fs = require('file-system');
+const fs = require('fs');
 const minimatch = require('minimatch');
 const path = require('path');
 
 const DEFAULT_CONFIG = {
-    'staticPath': [ 'static' ],
+    'staticPath': ['static'],
     'watcherGlob': null,
     'excludeGlob': null,
     'globOptions': {}
 };
 
 module.exports = bundler => {
-    bundler.on('bundled', async(bundle) => {
+    bundler.on('bundled', async (bundle) => {
 
         // main asset and package dir, depending on version of parcel-bundler
         let mainAsset =
@@ -31,10 +31,10 @@ module.exports = bundler => {
             config.staticPath = pkg.staticPath;
         }
         if (!Array.isArray(config.staticPath)) { // ensure array
-            config.staticPath = [ config.staticPath ];
+            config.staticPath = [config.staticPath];
         }
         if (config.excludeGlob && !Array.isArray(config.excludeGlob)) {
-            config.excludeGlob = [ config.excludeGlob ];
+            config.excludeGlob = [config.excludeGlob];
         }
 
         // poor-man's logger
@@ -74,6 +74,36 @@ module.exports = bundler => {
 
         // recursive copy function
         let numWatches = 0;
+
+        /**
+         * Recurse into directory and execute callback function for each file and folder.
+         *
+         * Based on https://github.com/douzi8/file-system/blob/master/file-system.js#L254
+         *
+         * @param dirpath directory to start from
+         * @param callback function to be run on every file/directory
+         */
+        const recurseSync = (dirpath, callback) => {
+            const rootpath = dirpath;
+
+            function recurse(dirpath) {
+                fs.readdirSync(dirpath).forEach(function (filename) {
+                    var filepath = path.join(dirpath, filename);
+                    var stats = fs.statSync(filepath);
+                    var relative = path.relative(rootpath, filepath);
+
+                    if (stats.isDirectory()) {
+                        callback(filepath, relative);
+                        recurse(filepath);
+                    } else {
+                        callback(filepath, relative, filename);
+                    }
+
+                });
+            }
+
+            recurse(dirpath);
+        };
         const copyDir = (staticDir, bundleDir, excludeGlob) => {
             if (fs.existsSync(staticDir)) {
                 const copy = (filepath, relative, filename) => {
@@ -85,7 +115,7 @@ module.exports = bundler => {
 
                     const dest = filepath.replace(staticDir, bundleDir);
                     if (!filename) {
-                        fs.mkdirSync(filepath, dest);
+                        fs.mkdirSync(dest, {recursive: true});
                     } else {
                         if (fs.existsSync(dest)) {
                             const destStat = fs.statSync(dest);
@@ -104,7 +134,7 @@ module.exports = bundler => {
                         }
                     }
                 };
-                fs.recurseSync(staticDir, copy);
+                recurseSync(staticDir, copy);
             } else {
                 pmLog(2, `Static directory '${staticDir}' does not exist. Skipping.`);
             }
@@ -116,7 +146,7 @@ module.exports = bundler => {
                 ? path.join(bundleDir, dir.staticOutDir)
                 : bundleDir;
             // merge global exclude glob with static path exclude glob
-            const excludeGlob = (config.excludeGlob || []).concat((dir.excludeGlob || [])); 
+            const excludeGlob = (config.excludeGlob || []).concat((dir.excludeGlob || []));
             copyDir(path.join(pkg.pkgdir, dir.staticPath), copyTo, excludeGlob);
         }
 

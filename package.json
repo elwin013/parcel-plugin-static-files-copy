@@ -7,7 +7,6 @@
     "url": "https://github.com/elwin013/parcel-plugin-static-files-copy/issues"
   },
   "dependencies": {
-    "file-system": "2.2.2",
     "minimatch": "3.0.4",
     "path": "0.12.7"
   },
