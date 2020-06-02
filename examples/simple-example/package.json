@@ -11,7 +11,7 @@
     "watcherGlob": "**"
   },
   "devDependencies": {
-    "parcel-bundler": "1.12.3",
+    "parcel-bundler": "1.12.4",
     "parcel-plugin-static-files-copy": "file:../.."
   },
   "dependencies": {}
