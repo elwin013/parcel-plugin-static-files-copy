@@ -1,17 +1,17 @@
 {
-  "name": "multiple-staticpath",
+  "name": "multiple-entry-points-with-common-static",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build src/index.html"
+    "build": "parcel build src/*/index.html"
   },
   "staticFiles": {
     "staticPath": [
-      "static",
-      "public"
-    ],
-    "watcherGlob": "**"
+      {
+        "staticPath": "static"
+      }
+    ]
   },
   "devDependencies": {
     "parcel-bundler": "1.12.4",
