@@ -140,14 +140,28 @@ module.exports = bundler => {
             }
         };
 
+        const outDir = bundler.options.outDir;
         const bundleDir = path.dirname(bundle.name || bundler.mainBundle.childBundles.values().next().value.name);
-        for (let dir of config.staticPath) {
-            const copyTo = dir.staticOutDir
-                ? path.join(bundleDir, dir.staticOutDir)
-                : bundleDir;
-            // merge global exclude glob with static path exclude glob
-            const excludeGlob = (config.excludeGlob || []).concat((dir.excludeGlob || []));
-            copyDir(path.join(pkg.pkgdir, dir.staticPath), copyTo, excludeGlob);
+        if (!bundle.name) { // multiple entry points
+            for (let singleBundle of bundler.mainBundle.childBundles.values()) {
+                for (let dir of config.staticPath) {
+                    const copyTo = dir.staticOutDir && dir.staticOutDir.startsWith('/')
+                        ? path.join(outDir, dir.staticOutDir)
+                        : path.join(path.dirname(singleBundle.name), dir.staticOutDir ? dir.staticOutDir : '');
+                    // merge global exclude glob with static path exclude glob
+                    const excludeGlob = (config.excludeGlob || []).concat((dir.excludeGlob || []));
+                    copyDir(path.join(pkg.pkgdir, dir.staticPath), copyTo, excludeGlob);
+                }
+            }
+        } else {
+            for (let dir of config.staticPath) {
+                const copyTo = dir.staticOutDir
+                    ? path.join(outDir, dir.staticOutDir)
+                    : bundleDir;
+                // merge global exclude glob with static path exclude glob
+                const excludeGlob = (config.excludeGlob || []).concat((dir.excludeGlob || []));
+                copyDir(path.join(pkg.pkgdir, dir.staticPath), copyTo, excludeGlob);
+            }
         }
 
         if (config.watcherGlob && bundler.watcher) {
