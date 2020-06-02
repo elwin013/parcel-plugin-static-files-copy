@@ -8,6 +8,10 @@ ParcelJS plugin to copy static files from some directory to directory with bundl
 yarn add parcel-plugin-static-files-copy --dev
 ```
 
+```
+npm install -D parcel-plugin-static-files-copy
+```
+
 ## Usage
 
 1. Create `static` directory in you project root.
