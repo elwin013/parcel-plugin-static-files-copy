@@ -210,7 +210,7 @@ Excludes the `test` directory and all files inside the `test` directory, includi
 
 You can use `env` parameter in `staticPath` object to select static path used in environment chosen by passing `NODE_ENV`:
 
-```
+```json
 // package.json
 {
     ...
