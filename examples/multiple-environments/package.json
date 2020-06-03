@@ -1,0 +1,32 @@
+{
+  "name": "multiple-environments",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:dev": "NODE_ENV=dev parcel build src/index.html",
+    "build:prod": "NODE_ENV=prod parcel build src/index.html"
+  },
+  "staticFiles": {
+    "staticPath": [
+      {
+        "staticPath": "static-dev",
+        "env": "dev"
+      },
+      {
+        "staticPath": "static-dev2",
+        "env": "dev"
+      },
+      {
+        "staticPath": "static-prod",
+        "env": "prod"
+      }
+    ],
+    "watcherGlob": "**"
+  },
+  "devDependencies": {
+    "parcel-bundler": "1.12.4",
+    "parcel-plugin-static-files-copy": "file:../.."
+  },
+  "dependencies": {}
+}
