@@ -9,7 +9,8 @@
   "staticFiles": {
     "staticPath": [
       {
-        "staticPath": "static"
+        "staticPath": "static",
+        "staticOutDir": "assets"
       }
     ]
   },

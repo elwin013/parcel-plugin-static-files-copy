@@ -1,18 +1,20 @@
 {
-  "name": "multiple-entry-points-with-common-static",
+  "name": "simple-custom-out-dir",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build src/*/index.html"
+    "build": "parcel build src/client/index.html -d dist/client",
+    "watch": "parcel src/client/index.html -d dist/client"
   },
   "staticFiles": {
     "staticPath": [
       {
-        "staticPath": "static",
-        "staticOutDir": "/assets"
+        "staticPath": "assets",
+        "staticOutDir": "assets"
       }
-    ]
+    ],
+    "watcherGlob": "**"
   },
   "devDependencies": {
     "parcel-bundler": "1.12.4",
