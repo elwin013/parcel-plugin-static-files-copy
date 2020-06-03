@@ -229,8 +229,8 @@ You can use `env` parameter in `staticPath` object to select static path used in
             "staticPath": "static-prod",
             "env": "prod"
           }
-        ],
-      },
+        ]
+      }
 }
 ```
 
