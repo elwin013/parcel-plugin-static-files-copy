@@ -141,9 +141,14 @@ module.exports = bundler => {
         };
 
         const outDir = bundler.options.outDir;
+        const currentEnv = process.env.NODE_ENV;
 
         function processStaticFiles(singleBundle) {
             for (let dir of config.staticPath) {
+                if (dir.env && dir.env !== currentEnv) {
+                    continue;
+                }
+
                 const copyTo = dir.staticOutDir && dir.staticOutDir.startsWith('/')
                     ? path.join(outDir, dir.staticOutDir)
                     : path.join(path.dirname(singleBundle.name), dir.staticOutDir ? dir.staticOutDir : '');

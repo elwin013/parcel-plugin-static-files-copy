@@ -112,7 +112,7 @@ The following watches all XML files in the static directory:
 ```json
 // package.json
 {
-	...
+    ...
     "staticFiles": {
         "staticPath": "public",
         "watcherGlob": "**/*.xml"
@@ -125,7 +125,7 @@ To disable watching, either remove the `"watcherGlob"` key (disabled is the defa
 ```json
 // package.json
 {
-	...
+    ...
     "staticFiles": {
         "staticPath": "public",
         "watcherGlob": false
@@ -140,7 +140,7 @@ You can exclude files and directories in your `staticPath` from getting copied t
 ```json
 // package.json
 {
-	...
+    ...
     "staticFiles": {
         "staticPath": "public",
         "excludeGlob": "**/*.md"
@@ -175,7 +175,7 @@ You can use the `excludeGlob` and negate it to achieve including behavior:
 ```json
 // package.json
 {
-	...
+    ...
     "staticFiles": {
         "staticPath": "src",
         "excludeGlob": "**/!(locales)/*.+(!(txt)|!(json))"
@@ -193,7 +193,7 @@ Passing [options into minimatch](https://github.com/isaacs/minimatch#options) to
 ```json
 // package.json
 {
-	...
+    ...
     "staticFiles": {
         "staticPath": "public",
         "excludeGlob": ["test", "test/**"],
@@ -206,6 +206,39 @@ Passing [options into minimatch](https://github.com/isaacs/minimatch#options) to
 
 Excludes the `test` directory and all files inside the `test` directory, including files starting with a dot, from getting copied.
 
+### Dev and production config using NODE_ENV
+
+You can use `env` parameter in `staticPath` object to select static path used in environment chosen by passing `NODE_ENV`:
+
+```
+// package.json
+{
+    ...
+      "scripts": {
+        "build:dev": "NODE_ENV=dev parcel build src/index.html",
+        "build:prod": "NODE_ENV=prod parcel build src/index.html"
+      },
+    ...
+      "staticFiles": {
+        "staticPath": [
+          {
+            "staticPath": "static-dev",
+            "env": "dev"
+          },
+          {
+            "staticPath": "static-prod",
+            "env": "prod"
+          }
+        ],
+      },
+}
+```
+
+Then running:
+* `build:dev` will copy files from `static-dev` only,
+* `build:prod` will copy files from `static-prod` only.
+
+You can specify from zero to many static paths per environment.
 
 ## Contribute
 
