@@ -240,6 +240,10 @@ Then running:
 
 You can specify from zero to many static paths per environment.
 
+### Additional examples
+
+Check [examples](https://github.com/elwin013/parcel-plugin-static-files-copy/tree/master/examples) directory for additional examples. 
+
 ## Contribute
 
 You're interested in contributing? Awesome! Fork, make change, commit and create pull request. I'll do my best to merge changes!
