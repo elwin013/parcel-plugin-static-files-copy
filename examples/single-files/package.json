@@ -4,11 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build src/index.html",
-    "watch": "parcel src/index.html"
+    "build": "parcel build src/index.html"
   },
   "staticFiles": {
-    "staticPath": ["static", "static"],
+    "staticPath": "static/test1.txt",
     "watcherGlob": "**"
   },
   "devDependencies": {

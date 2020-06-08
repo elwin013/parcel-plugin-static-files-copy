@@ -154,7 +154,11 @@ module.exports = bundler => {
                     : path.join(path.dirname(singleBundle.name), dir.staticOutDir ? dir.staticOutDir : '');
                 // merge global exclude glob with static path exclude glob
                 const excludeGlob = (config.excludeGlob || []).concat((dir.excludeGlob || []));
-                fs.mkdirSync(copyTo, {recursive: true});
+
+                if (!fs.existsSync(copyTo)) {
+                    fs.mkdirSync(copyTo, {recursive: true});
+                }
+
                 copyDir(path.join(pkg.pkgdir, dir.staticPath), copyTo, excludeGlob);
             }
         }

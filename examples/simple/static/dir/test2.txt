@@ -1,1 +1,1 @@
-test2
+dir/test2
