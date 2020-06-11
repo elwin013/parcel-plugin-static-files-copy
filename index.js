@@ -115,7 +115,9 @@ module.exports = bundler => {
 
                     const dest = filepath.replace(staticDir, bundleDir);
                     if (!filename) {
-                        fs.mkdirSync(dest, {recursive: true});
+                        if (!fs.existsSync(dest)) {
+                            fs.mkdirSync(dest, {recursive: true});
+                        }
                     } else {
                         if (fs.existsSync(dest)) {
                             const destStat = fs.statSync(dest);
