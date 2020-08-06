@@ -8,7 +8,10 @@
     "watch": "parcel src/index.html"
   },
   "staticFiles": {
-    "staticPath": ["static", "static"],
+    "staticPath": [
+      "static",
+      "static"
+    ],
     "watcherGlob": "**"
   },
   "devDependencies": {
