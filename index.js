@@ -105,41 +105,65 @@ module.exports = bundler => {
             recurse(dirpath);
         };
         const copyDir = (staticDir, bundleDir, excludeGlob) => {
-            if (fs.existsSync(staticDir)) {
-                const copy = (filepath, relative, filename) => {
-                    if (excludeGlob.find(excludeGlob =>
-                        minimatch(filepath, path.join(staticDir, excludeGlob), config.globOptions)
-                    )) {
-                        return;
-                    }
+            const copy = (filepath, relative, filename) => {
+                if (excludeGlob.find(excludeGlob =>
+                    minimatch(filepath, path.join(staticDir, excludeGlob), config.globOptions)
+                )) {
+                    return;
+                }
 
-                    const dest = filepath.replace(staticDir, bundleDir);
-                    if (!filename) {
-                        if (!fs.existsSync(dest)) {
-                            fs.mkdirSync(dest, {recursive: true});
-                        }
-                    } else {
-                        if (fs.existsSync(dest)) {
-                            const destStat = fs.statSync(dest);
-                            const srcStat = fs.statSync(filepath);
-                            if (destStat.mtime <= srcStat.mtime) { // File was modified - let's copy it and inform about overwriting.
-                                pmLog(3, `Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
-                                fs.copyFileSync(filepath, dest);
-                            }
-                        } else {
+                const dest = filepath.replace(staticDir, bundleDir);
+                if (!filename) {
+                    if (!fs.existsSync(dest)) {
+                        fs.mkdirSync(dest, {recursive: true});
+                    }
+                } else {
+                    if (fs.existsSync(dest)) {
+                        const destStat = fs.statSync(dest);
+                        const srcStat = fs.statSync(filepath);
+                        if (destStat.mtime <= srcStat.mtime) { // File was modified - let's copy it and inform about overwriting.
+                            pmLog(3, `Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
                             fs.copyFileSync(filepath, dest);
                         }
-                        // watch for changes?
-                        if (config.watcherGlob && bundler.watcher && minimatch(filepath, config.watcherGlob, config.globOptions)) {
-                            numWatches++;
-                            bundler.watch(filepath, mainAsset);
-                        }
+                    } else {
+                        fs.copyFileSync(filepath, dest);
                     }
-                };
-                recurseSync(staticDir, copy);
-            } else {
-                pmLog(2, `Static directory '${staticDir}' does not exist. Skipping.`);
+                    // watch for changes?
+                    if (config.watcherGlob && bundler.watcher && minimatch(filepath, config.watcherGlob, config.globOptions)) {
+                        numWatches++;
+                        bundler.watch(filepath, mainAsset);
+                    }
+                }
+            };
+            recurseSync(staticDir, copy);
+        };
+
+        const copyFile = (filePath, bundleDir, excludeGlob) => {
+            if (excludeGlob.find(excludeGlob =>
+                minimatch(filePath, path.join(staticDir, excludeGlob), config.globOptions)
+            )) {
+                return;
             }
+
+            const parentDir = path.join(filePath, '..')
+            const dest = filePath.replace(parentDir, bundleDir);
+        
+            if (fs.existsSync(dest)) {
+                const destStat = fs.statSync(dest);
+                const srcStat = fs.statSync(filePath);
+                if (destStat.mtime <= srcStat.mtime) { // File was modified - let's copy it and inform about overwriting.
+                    pmLog(3, `Static file '${filePath}' already exists in '${bundleDir}'. Overwriting.`);
+                    fs.copyFileSync(filePath, dest);
+                }
+            } else {
+                fs.copyFileSync(filePath, dest);
+            }
+            // watch for changes?
+            if (config.watcherGlob && bundler.watcher && minimatch(filepath, config.watcherGlob, config.globOptions)) {
+                numWatches++;
+                bundler.watch(filePath, mainAsset);
+            }
+        
         };
 
         const outDir = bundler.options.outDir;
@@ -161,7 +185,18 @@ module.exports = bundler => {
                     fs.mkdirSync(copyTo, {recursive: true});
                 }
 
-                copyDir(path.join(pkg.pkgdir, dir.staticPath), copyTo, excludeGlob);
+                
+                const copyFrom = path.join(pkg.pkgdir, dir.staticPath);
+                if (fs.existsSync(copyFrom)) {
+                    const stats = fs.statSync(copyFrom);
+                    if (stats.isDirectory()) {
+                        copyDir(copyFrom, copyTo, excludeGlob);
+                    } else {
+                        copyFile(copyFrom, copyTo, excludeGlob);
+                    }
+                } else {
+                    pmLog(2, `Static directory or file '${copyFrom}' does not exist. Skipping.`);
+                }
             }
         }
 
