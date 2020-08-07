@@ -104,6 +104,36 @@ module.exports = bundler => {
 
             recurse(dirpath);
         };
+
+        function copySingleFile(bundleDir, dest, filepath) {
+
+            if (fs.existsSync(dest)) {
+                const destStat = fs.statSync(dest);
+                const srcStat = fs.statSync(filepath);
+                if (destStat.mtime < srcStat.mtime) { // File was modified - let's copy it and inform about overwriting.
+                    pmLog(3, `Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
+                    fs.copyFileSync(filepath, dest);
+                }
+            } else {
+                fs.copyFileSync(filepath, dest);
+            }
+            // watch for changes?
+            if (config.watcherGlob && bundler.watcher && minimatch(filepath, config.watcherGlob, config.globOptions)) {
+                numWatches++;
+                bundler.watch(filepath, mainAsset);
+            }
+        }
+
+        const copyFile = (filepath, bundleDir, excludeGlob) => {
+            if (excludeGlob.find(excludeGlob =>
+                minimatch(filepath, path.join(filepath, excludeGlob), config.globOptions)
+            )) {
+                return;
+            }
+            const dest = path.join(bundleDir, path.basename(filepath));
+            copySingleFile(bundleDir, dest, filepath);
+        };
+
         const copyDir = (staticDir, bundleDir, excludeGlob) => {
             if (fs.existsSync(staticDir)) {
                 const copy = (filepath, relative, filename) => {
@@ -112,6 +142,7 @@ module.exports = bundler => {
                     )) {
                         return;
                     }
+
 
                     const dest = filepath.replace(staticDir, bundleDir);
                     if (!filename) {
@@ -161,7 +192,12 @@ module.exports = bundler => {
                     fs.mkdirSync(copyTo, {recursive: true});
                 }
 
-                copyDir(path.join(pkg.pkgdir, dir.staticPath), copyTo, excludeGlob);
+                let staticPath = path.join(pkg.pkgdir, dir.staticPath);
+                if (fs.existsSync(staticPath) && fs.statSync(staticPath).isDirectory()) {
+                    copyDir(staticPath, copyTo, excludeGlob);
+                } else {
+                    copyFile(staticPath, copyTo, excludeGlob);
+                }
             }
         }
 
