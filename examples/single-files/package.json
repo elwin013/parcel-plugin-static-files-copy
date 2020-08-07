@@ -4,11 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build src/index.html"
+    "build": "parcel build src/index.html --log-level 4",
+    "serve": "parcel src/index.html --log-level 4"
   },
   "staticFiles": {
-    "staticPath": "static/test1.txt",
-    "watcherGlob": "**"
+    "staticPath": [
+      {
+        "staticPath": "static/test1.txt",
+        "staticOutDir": "test1"
+      },
+      {
+        "staticPath": "static/dir/test2.txt"
+      }
+    ],
+    "watcherGlob": "**",
+    "excludeGlob": "test1*"
   },
   "devDependencies": {
     "parcel-bundler": "1.12.4",

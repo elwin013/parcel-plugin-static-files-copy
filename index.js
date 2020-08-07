@@ -106,7 +106,6 @@ module.exports = bundler => {
         };
 
         function copySingleFile(bundleDir, dest, filepath) {
-
             if (fs.existsSync(dest)) {
                 const destStat = fs.statSync(dest);
                 const srcStat = fs.statSync(filepath);
@@ -124,10 +123,14 @@ module.exports = bundler => {
             }
         }
 
+        const shouldBeExcluded = (file, staticPath, excludeGlob) => {
+            return !!excludeGlob.find(excludeGlob =>
+                minimatch(file, path.join(staticPath, excludeGlob), config.globOptions)
+            );
+        };
+
         const copyFile = (filepath, bundleDir, excludeGlob) => {
-            if (excludeGlob.find(excludeGlob =>
-                minimatch(filepath, path.join(filepath, excludeGlob), config.globOptions)
-            )) {
+            if (shouldBeExcluded(filepath, path.dirname(filepath), excludeGlob)) {
                 return;
             }
             const dest = path.join(bundleDir, path.basename(filepath));
@@ -135,42 +138,21 @@ module.exports = bundler => {
         };
 
         const copyDir = (staticDir, bundleDir, excludeGlob) => {
-            if (fs.existsSync(staticDir)) {
-                const copy = (filepath, relative, filename) => {
-                    if (excludeGlob.find(excludeGlob =>
-                        minimatch(filepath, path.join(staticDir, excludeGlob), config.globOptions)
-                    )) {
-                        return;
-                    }
+            const copy = (filepath, relative, filename) => {
+                if (shouldBeExcluded(filepath, staticDir, excludeGlob)) {
+                    return;
+                }
 
-
-                    const dest = filepath.replace(staticDir, bundleDir);
-                    if (!filename) {
-                        if (!fs.existsSync(dest)) {
-                            fs.mkdirSync(dest, {recursive: true});
-                        }
-                    } else {
-                        if (fs.existsSync(dest)) {
-                            const destStat = fs.statSync(dest);
-                            const srcStat = fs.statSync(filepath);
-                            if (destStat.mtime < srcStat.mtime) { // File was modified - let's copy it and inform about overwriting.
-                                pmLog(3, `Static file '${filepath}' already exists in '${bundleDir}'. Overwriting.`);
-                                fs.copyFileSync(filepath, dest);
-                            }
-                        } else {
-                            fs.copyFileSync(filepath, dest);
-                        }
-                        // watch for changes?
-                        if (config.watcherGlob && bundler.watcher && minimatch(filepath, config.watcherGlob, config.globOptions)) {
-                            numWatches++;
-                            bundler.watch(filepath, mainAsset);
-                        }
+                const dest = filepath.replace(staticDir, bundleDir);
+                if (!filename) {
+                    if (!fs.existsSync(dest)) {
+                        fs.mkdirSync(dest, {recursive: true});
                     }
-                };
-                recurseSync(staticDir, copy);
-            } else {
-                pmLog(2, `Static directory '${staticDir}' does not exist. Skipping.`);
-            }
+                } else {
+                    copySingleFile(bundleDir, dest, filepath);
+                }
+            };
+            recurseSync(staticDir, copy);
         };
 
         const outDir = bundler.options.outDir;
@@ -193,7 +175,11 @@ module.exports = bundler => {
                 }
 
                 let staticPath = path.join(pkg.pkgdir, dir.staticPath);
-                if (fs.existsSync(staticPath) && fs.statSync(staticPath).isDirectory()) {
+                if (!fs.existsSync(staticPath)) {
+                    pmLog(2, `Static file/directory '${staticPath}' does not exist. Skipping.`);
+                    return;
+                }
+                if (fs.statSync(staticPath).isDirectory()) {
                     copyDir(staticPath, copyTo, excludeGlob);
                 } else {
                     copyFile(staticPath, copyTo, excludeGlob);
