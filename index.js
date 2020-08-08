@@ -140,12 +140,12 @@ module.exports = bundler => {
 
         const copyFile = (filePath, bundleDir, excludeGlob) => {
             if (excludeGlob.find(excludeGlob =>
-                minimatch(filePath, path.join(staticDir, excludeGlob), config.globOptions)
+                minimatch(filePath, path.join(filePath, excludeGlob), config.globOptions)
             )) {
                 return;
             }
 
-            const parentDir = path.join(filePath, '..')
+            const parentDir = path.join(filePath, '..');
             const dest = filePath.replace(parentDir, bundleDir);
         
             if (fs.existsSync(dest)) {
@@ -159,7 +159,7 @@ module.exports = bundler => {
                 fs.copyFileSync(filePath, dest);
             }
             // watch for changes?
-            if (config.watcherGlob && bundler.watcher && minimatch(filepath, config.watcherGlob, config.globOptions)) {
+            if (config.watcherGlob && bundler.watcher && minimatch(filePath, config.watcherGlob, config.globOptions)) {
                 numWatches++;
                 bundler.watch(filePath, mainAsset);
             }
