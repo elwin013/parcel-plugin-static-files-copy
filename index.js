@@ -176,7 +176,7 @@ module.exports = bundler => {
 
                 let staticPath = path.join(pkg.pkgdir, dir.staticPath);
                 if (!fs.existsSync(staticPath)) {
-                    pmLog(2, `Static file/directory '${staticPath}' does not exist. Skipping.`);
+                    pmLog(2, `Static path (file or directory) '${staticPath}' does not exist. Skipping.`);
                     return;
                 }
                 if (fs.statSync(staticPath).isDirectory()) {
