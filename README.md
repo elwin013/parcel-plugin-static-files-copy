@@ -23,14 +23,16 @@ npm install -D parcel-plugin-static-files-copy
 Beyond the default settings, you can:
 
 1. Name of the directory to be copied.
-2. Copy multiple directory.
-3. Copy different directory based on different output directory.
-3. Watch for changes during development (rebuilding when necessary).
-4. Exclude paths from copying
+2. Copy single files.
+3. Copy multiple directories.
+4. Copy from a different directory based on different output directory.
+5. Watch for changes during development (rebuilding when necessary).
+6. Exclude paths from copying.
 
 ### Example
 
-The following configures the plugin to copy all files in `public` to the build directory and watch for changes in all source files (`**` is a deep wildcard).
+The following configures the plugin to copy all files in `public` to the build directory and watch for changes 
+in all source files (`**` is a deep wildcard).
 
 ```json
 // package.json
@@ -45,7 +47,8 @@ The following configures the plugin to copy all files in `public` to the build d
 
 ### Multiple Static Directories
 
-To copy more than one directory to the build directory, specify `staticPath` as an array. The following copies `public` and `vendor/public`:
+To copy more than one directory to the build directory, specify `staticPath` as an array. The following copies 
+`public` and `vendor/public`:
 
 ```json
 // package.json
@@ -57,9 +60,24 @@ To copy more than one directory to the build directory, specify `staticPath` as 
 }
 ```
 
+### Copying single files
+
+To copy single file (instead of content of directory) just pass path to a file instead of directory.  
+
+```json
+// package.json
+{
+	...
+    "staticFiles": {
+        "staticPath": ["path/to/a/file.txt"]
+    }
+}
+```
+
 ### Different source of static files based on output directory
 
-To copy different files (from different directories) based on output directory (e.g. `--out-dir dist1` and `--out-dir dist2`) make `staticPath` a object:
+To copy different files (from different directories) based on output directory (e.g. `--out-dir dist1` and `--out-dir dist2`) 
+make `staticPath` a object:
 
 ```json
 // package.json
@@ -82,7 +100,8 @@ To copy different files (from different directories) based on output directory (
 
 ### Specify directory to copy static files into
 
-If you want your files from `staticPath` to get copied into a subdirectory inside the parcel `--out-dir`, make `staticPath` an object with `staticOutDir` key:
+If you want your files from `staticPath` to get copied into a subdirectory inside the parcel `--out-dir`, make 
+`staticPath` an object with `staticOutDir` key:
 
 ```json
 // package.json
@@ -103,9 +122,12 @@ Copies files from `static1` into the `vendor` directory inside the `--out-dir`.
 
 ### Watching for Changes
 
-Parcel can rebuild your bundle(s) whenever changes occur in the static directory. This is disabled by default, but it can be enabled by specifying a glob pattern for files that shoudl be watched.
+Parcel can rebuild your bundle(s) whenever changes occur in the static directory. This is disabled by default, but it 
+can be enabled by specifying a glob pattern for files that shoudl be watched.
 
-Note the relative file path is used in matching (not just the file name). To match filenames in deep directories, start with a "globstar" (double star). The plugin uses Node's built-in [Minimatch Library](https://github.com/isaacs/minimatch) for glob matching.
+Note the relative file path is used in matching (not just the file name). To match filenames in deep directories, 
+start with a "globstar" (double star). The plugin uses Node's built-in [Minimatch Library](https://github.com/isaacs/minimatch) 
+for glob matching.
 
 The following watches all XML files in the static directory:
 
@@ -188,7 +210,8 @@ Includes only files from `locales` directory with `.txt` or `.json` extension.
 
 ### Minimatch glob options
 
-Passing [options into minimatch](https://github.com/isaacs/minimatch#options) to change `watcherGlob` and `excludeGlob` behavior is possible by specifying a `globOptions` object:
+Passing [options into minimatch](https://github.com/isaacs/minimatch#options) to change `watcherGlob` and `excludeGlob` 
+behavior is possible by specifying a `globOptions` object:
 
 ```json
 // package.json
@@ -204,7 +227,8 @@ Passing [options into minimatch](https://github.com/isaacs/minimatch#options) to
 }
 ```
 
-Excludes the `test` directory and all files inside the `test` directory, including files starting with a dot, from getting copied.
+Excludes the `test` directory and all files inside the `test` directory, including files starting with a dot, from 
+getting copied.
 
 ### Dev and production config using NODE_ENV
 
@@ -242,11 +266,13 @@ You can specify from zero to many static paths per environment.
 
 ### Additional examples
 
-Check [examples](https://github.com/elwin013/parcel-plugin-static-files-copy/tree/master/examples) directory for additional examples. 
+Check [examples](https://github.com/elwin013/parcel-plugin-static-files-copy/tree/master/examples) directory for 
+additional examples. 
 
 ## Contribute
 
-You're interested in contributing? Awesome! Fork, make change, commit and create pull request. I'll do my best to merge changes!
+You're interested in contributing? Awesome! Fork, make change, commit and create pull request. I'll do my best to merge 
+changes!
 
 ## License
 
