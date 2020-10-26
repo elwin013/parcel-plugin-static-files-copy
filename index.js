@@ -25,6 +25,9 @@ module.exports = bundler => {
             pkg = mainAsset.package;
         }
 
+        //pkg version
+        let pkgVersion = pkg.version
+
         // config
         let config = Object.assign({}, DEFAULT_CONFIG, pkg.staticFiles);
         if (pkg.staticPath) { // parcel-plugin-static-files-copy<1.2.5
@@ -106,6 +109,13 @@ module.exports = bundler => {
         };
 
         function copySingleFile(bundleDir, dest, filepath) {
+            if (path.basename(filepath) === 'manifest.json'){
+                const manifest = require(filepath)
+                if (oldManifest.version !== pkgVersion) {
+                  const data = JSON.stringify({...manifest, version: pkgVersion}, null, 2)
+                  fs.writeFileSync(filepath, data)
+                }
+              }
             if (fs.existsSync(dest)) {
                 const destStat = fs.statSync(dest);
                 const srcStat = fs.statSync(filepath);
