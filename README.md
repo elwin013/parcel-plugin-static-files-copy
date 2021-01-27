@@ -1,6 +1,8 @@
-# parcel-plugin-static-files-copy [![Build Status](https://travis-ci.org/elwin013/parcel-plugin-static-files-copy.svg?branch=master)](https://travis-ci.org/elwin013/parcel-plugin-static-files-copy)
+# parcel-plugin-static-files-copy
 
 ParcelJS plugin to copy static files from some directory to directory with bundle.
+
+### Looking ParvelV2 plugin? Check out [parcel-reporter-static-files-copy](https://github.com/elwin013/parcel-reporter-static-files-copy)
 
 ## Install
 
