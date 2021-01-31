@@ -2,7 +2,7 @@
 
 ParcelJS plugin to copy static files from some directory to directory with bundle.
 
-### Looking ParvelV2 plugin? Check out [parcel-reporter-static-files-copy](https://github.com/elwin013/parcel-reporter-static-files-copy)
+### Looking for the ParvelV2 plugin? Check out [parcel-reporter-static-files-copy](https://github.com/elwin013/parcel-reporter-static-files-copy)
 
 ## Install
 
@@ -125,7 +125,7 @@ Copies files from `static1` into the `vendor` directory inside the `--out-dir`.
 ### Watching for Changes
 
 Parcel can rebuild your bundle(s) whenever changes occur in the static directory. This is disabled by default, but it 
-can be enabled by specifying a glob pattern for files that shoudl be watched.
+can be enabled by specifying a glob pattern for files that should be watched.
 
 Note the relative file path is used in matching (not just the file name). To match filenames in deep directories, 
 start with a "globstar" (double star). The plugin uses Node's built-in [Minimatch Library](https://github.com/isaacs/minimatch) 
@@ -273,7 +273,7 @@ additional examples.
 
 ## Contribute
 
-You're interested in contributing? Awesome! Fork, make change, commit and create pull request. I'll do my best to merge 
+Are you interested in contributing? Awesome! Fork, make change, commit and create pull request. I'll do my best to merge 
 changes!
 
 ## License
