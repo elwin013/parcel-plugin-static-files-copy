@@ -2,7 +2,7 @@
 
 ParcelJS plugin to copy static files from some directory to directory with bundle.
 
-### Looking for the ParvelV2 plugin? Check out [parcel-reporter-static-files-copy](https://github.com/elwin013/parcel-reporter-static-files-copy)
+### Looking for the ParcelV2 plugin? Check out [parcel-reporter-static-files-copy](https://github.com/elwin013/parcel-reporter-static-files-copy)
 
 ## Install
 
