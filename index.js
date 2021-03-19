@@ -174,15 +174,21 @@ module.exports = bundler => {
                     fs.mkdirSync(copyTo, {recursive: true});
                 }
 
-                let staticPath = path.join(pkg.pkgdir, dir.staticPath);
-                if (!fs.existsSync(staticPath)) {
-                    pmLog(2, `Static path (file or directory) '${staticPath}' does not exist. Skipping.`);
-                    continue;
+                var paths = [];
+                if (!Array.isArray(dir.staticPath)) {
+                    paths = [dir.staticPath];
                 }
-                if (fs.statSync(staticPath).isDirectory()) {
-                    copyDir(staticPath, copyTo, excludeGlob);
-                } else {
-                    copyFile(staticPath, copyTo, excludeGlob);
+                for (let singlePath of paths) {
+                    let staticPath = path.join(pkg.pkgdir, singlePath);
+                    if (!fs.existsSync(staticPath)) {
+                        pmLog(2, `Static path (file or directory) '${staticPath}' does not exist. Skipping.`);
+                        continue;
+                    }
+                    if (fs.statSync(staticPath).isDirectory()) {
+                        copyDir(staticPath, copyTo, excludeGlob);
+                    } else {
+                        copyFile(staticPath, copyTo, excludeGlob);
+                    }
                 }
             }
         }
