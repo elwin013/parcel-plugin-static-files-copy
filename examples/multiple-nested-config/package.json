@@ -1,0 +1,35 @@
+{
+  "name": "multiple-nested-config",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "NODE_ENV=dev parcel build src/index.html",
+    "build-prod": "NODE_ENV=prod parcel build src/index.html"
+  },
+  "staticFiles": {
+    "staticPath": [
+      {
+        "staticPath": [
+          "assets/aaa.txt",
+          "assets/bbb.txt"
+        ],
+        "env": "dev",
+        "staticOutDir": "vendor1"
+      },
+      {
+        "staticPath": [
+          "assets/bbb.txt",
+          "assets/ccc.txt"
+        ],
+        "env": "prod",
+        "staticOutDir": "vendor2"
+      }
+    ]
+  },
+  "devDependencies": {
+    "parcel-bundler": "1.12.4",
+    "parcel-plugin-static-files-copy": "file:../.."
+  },
+  "dependencies": {}
+}
