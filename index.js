@@ -174,9 +174,9 @@ module.exports = bundler => {
                     fs.mkdirSync(copyTo, {recursive: true});
                 }
 
-                var paths = [];
-                if (!Array.isArray(dir.staticPath)) {
-                    paths = [dir.staticPath];
+                var paths = dir.staticPath;
+                if (!Array.isArray(paths)) {
+                    paths = [paths];
                 }
                 for (let singlePath of paths) {
                     let staticPath = path.join(pkg.pkgdir, singlePath);
